@@ -21,12 +21,12 @@
 {#					<form method="post" action="/users/login_check/">#}
 
                         {% csrf_token %}
-						<input type="text" name="username" id="username" class="name_input" placeholder="请输入用户名">
+						<input type="text" name="username" id="username" class="name_input" value="{{ username }}" placeholder="请输入用户名">
 						<div class="user_error">输入错误</div>
 						<input type="password" name="pwd" id="pwd" class="pass_input" placeholder="请输入密码">
 						<div class="pwd_error">输入错误</div>
 						<div class="more_input clearfix">
-							<input type="checkbox" name="" id="remember">
+							<input type="checkbox" name="remember" {{ checked }}>
 							<label>记住用户名</label>
 							<a href="#">忘记密码</a>
 						</div>
@@ -40,11 +40,15 @@
     $('#submit').click(function () {
         var username = $('#username').val();
         var password = $('#pwd').val();
-        var remember = $('#remember').val();
+        var csrf = $('input[name="csrfmiddlewaretoken"]').val()
+        var remember = $('input[name="remember"]').prop('checked');
+        console.log(remember)
         data={
             'username':username,
             'password':password,
-{#            'rememver':remember,#}
+            'remember':remember,
+            'csrfmiddlewaretoken':csrf,
+
         }
         $.ajax({
             data:JSON.stringify(data),
@@ -58,6 +62,7 @@
                 }
                 else{
                     alert('登录失败！')
+                    $("#username").next().html('用户名或密码错误').show()
                 }
             }
         });

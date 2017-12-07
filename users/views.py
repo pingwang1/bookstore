@@ -40,30 +40,37 @@ def register_handler(request):
 	return JsonResponse({'res':1})
 
 def login(request):
-	# context={
-	# 	'username':'',
-	# 	'password':'',
-	# }
-	return render(request,'users/login.html')
+	'''显示登录页面'''
+	context={
+		'username':'',
+		'checked':'',
+	}
+	return render(request,'users/login.html',context)
 
 @csrf_exempt
 def login_check(request):
-	print(request.body)
 	data=json.loads(request.body.decode('utf-8'))
 	username = data.get('username')
 	password = data.get('password')
-	# remember = data.get('remember')
-	print(username,password)
+	remember = data.get('remember')
 	passport = Passport.objects.get_one_passport(username=username,password=password)
-	print(passport)
+	jres = JsonResponse({'code':200})
 	if passport:
 		print("登录成功！")
 		# 记住用户的登录状态
+		print(remember,type(remember))
+		if remember:
+			#记住用户名
+			jres.set_cookie('username',username,max_age=7*24*3600)
+		else:
+			#不记住
+			jres.delete_cookie('username')
 		request.session['islogin'] = True
 		request.session['username'] = username
 		request.session['passport_id'] = passport.id
+
 		# return redirect(reverse('books:index'))
-		return JsonResponse({'code':200})
+		return jres
 	else:
 		# p = Passport.objects.get_one_passport(username=username)
 		# if not p:
