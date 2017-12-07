@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'users',
     'books',
     'tinymce',
+    'cart',
 
 ]
 

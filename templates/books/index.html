@@ -261,5 +261,11 @@
 		<p>CopyRight © 2016 北京尚硅谷信息技术有限公司 All Rights Reserved</p>
 		<p>电话：010-****888    京ICP备*******8号</p>
 	</div>
+<script type="application/javascript">
+    $.get('/cart/cart_count/',function (data) {
+        //res是商品的总数
+        $('#show_count').html(data.res);
+    });
+</script>
 </body>
 </html>

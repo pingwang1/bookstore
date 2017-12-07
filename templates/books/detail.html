@@ -96,7 +96,7 @@
 			<div class="book_num clearfix">
 				<div class="num_name fl">数 量：</div>
 				<div class="num_add fl">
-					<input type="text" class="num_show fl" value="1">
+					<input type="text" class="num_show fl" id="count" value="1">
 					<a href="javascript:;" class="add fr">+</a>
 					<a href="javascript:;" class="minus fr">-</a>	
 				</div> 
@@ -104,7 +104,7 @@
 			<div class="total">总价：<em>{{ book.price }}</em></div>
 			<div class="operate_btn">
 				<a href="javascript:;" class="buy_btn">立即购买</a>
-				<a href="javascript:;" class="add_cart" id="add_cart">加入购物车</a>				
+				<a href="javascript:;" class="add_cart" id="add_cart" books_id="{{ book.id }}" >加入购物车</a>
 			</div>
 		</div>
 	</div>
@@ -134,7 +134,7 @@
 			<div class="tab_content">
 				<dl>
 					<dt>商品详情：</dt>
-					<dd>{{ book.desc }} </dd>
+					<dd>{{ book.detail |safe }} </dd>
 				</dl>
 			</div>
 
@@ -152,16 +152,107 @@
 
 		$(".add_jump").css({'left':$add_y+80,'top':$add_x+10,'display':'block'})
 		$('#add_cart').click(function(){
-			$(".add_jump").stop().animate({
-				'left': $to_y+7,
-				'top': $to_x+7},
-				"fast", function() {
-					$(".add_jump").fadeOut('fast',function(){
-						$('#show_count').html(2);
-					});
-			});
+		    var books_id=$(".add_cart").attr('books_id');
+		    var book_count =$('#count').val();
+		    var  csrf = $('input[name="csrfmiddlewaretoken"]').val();
+		    data={
+		        'book_id':books_id,
+                'book_count':book_count,
+                'csrfmiddlewaretoken':csrf,
+            };
+		    $.ajax({
+		        data:JSON.stringify(data),
+		        type:'POST',
+                url:'/cart/cart_add/',
+                success:function (data) {
+                    console.log(data.code);
+                    //添加成功
+                    if (data.code==5){
+                        $(".add_jump").stop().animate({
+                            'left': $to_y+7,
+                            'top': $to_x+7},
+                            "fast", function() {
+                                $(".add_jump").fadeOut('fast',function(){
+                                    count =$('#show_count').html()
+                                    count=parseInt(count)+parseInt(book_count)
+                                    $('#show_count').html(count);
+                                });
+                        });
+                    }
+                    else{
+                        //添加失败
+                        alert(data.errmsg);
+                    }
+                }
+
+            });
+
 		})
 	</script>
-	
+<script type="application/javascript">
+    $.get('/cart/cart_count/',function (data) {
+        //res是商品的总数
+        $('#show_count').html(data.res);
+    });
+</script>
+
+{% block topfiles %}
+    <script type="application/javascript">
+    $(function () {
+{#        update_total_price()#}
+        //计算总价
+        function updata_total_price() {
+            //获取商品的价格和数量
+            books_price = $('.show_pirze').children('em').text();
+            books_count = $('.num_show').val();
+            console.log(books_price,books_count)
+            //计算商品的总价
+            books_price=parseFloat(books_price);
+            books_count=parseInt(books_count);
+            total_price=books_price*books_count;
+            //设置总价
+            $('.total').children('em').text(total_price.toFixed(2)+'元');
+        }
+
+        //商品增加
+        $('.add').click(function () {
+            //获取商品的数量
+            books_count = $('.num_show').val()
+            //加1
+            books_count = parseInt(books_count)+1
+            $('.num_show').val(books_count)
+            //计算总价
+            updata_total_price()
+        });
+        //商品减少
+        $('.minus').click(function () {
+            //获取商品的数量
+            books_count = $('.num_show').val()
+            //减1
+            books_count=parseInt(books_count)-1
+            if (books_count==0){
+                books_count =1
+            }
+            //重新设置值
+            $('.num_show').val(books_count)
+            //计算总价
+            updata_total_price()
+        });
+        //手动输入
+        $('.num_show').blur(function () {
+            //获取商品数量
+            books_count = $(this).val()
+            //数据校验
+            if (isNaN(books_count)||books_count.trim().length==0||parseInt(books_count) <= 0){
+                books_count=1
+            }
+            //重新设置值
+            $('.num_show').val(parseInt(books_count))
+            //计算总价
+            updata_total_price()
+        });
+    })
+    </script>
+{% endblock %}
 </body>
 </html>
