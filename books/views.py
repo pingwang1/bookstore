@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from books.models import Books
 from books.enums import *
 from django.core.urlresolvers import reverse
@@ -41,9 +41,58 @@ def index(request):
 	return render(request,'books/index.html',context)
 
 def detail(request,book_id):
-	print(book_id)
 	book = Books.objects.get_books_by_id(books_id=book_id)
 	print(book.name,book.price,book.desc,book.detail)
-
+	book_new=Books.objects.get_books_by_type(type_id=book.type_id,limit=2)
 	# return JsonResponse({'code':200})
-	return render(request,'books/detail.html',{'book':book})
+	return render(request,'books/detail.html',{'book':book,'book_new':book_new})
+
+# 商品种类 页码 排序方式
+# /list/(种类id)/(页码)/?sort=排序方式
+def list(request,type_id,page):
+	'''商品列表的页面'''
+	print(type_id,page)
+	#获取排序方式
+	sort = request.GET.get('sort','default')
+	#判断type_id是否合法
+	if int(type_id) not in BOOKS_TYPE.keys():
+		return redirect(reverse('books:index'))
+	#根据商品种类id和排序方式查询数据
+	book_li = Books.objects.get_books_by_type(type_id=type_id,sort=sort)
+	#分页
+	paginator = Paginator(book_li,1)
+	#获取分页之后的总页数
+	num_pages = paginator.num_pages
+	#获取第page页的数据
+	if page=='' or int(page) >num_pages:
+		page = 1
+	else:
+		page = int(page)
+	#返回值是一个Ｐａｇｅ类的实例对象
+	book_li = paginator.page(page)
+	#进行页码控制
+	#1.总页数<5,显示所有页码
+	#2.当前页是前三页，显示１－５
+	#3.当前页是后３页，显示后５页
+	#4.其他情况，显示当前页前２页，后两页，当前页
+	if num_pages <5:
+		pages = range(1,num_pages+1)
+	elif page <=3:
+		pages = range(1,6)
+	elif num_pages-page<=2:
+		pages = range(num_pages-4,num_pages+1)
+	else:
+		pages = range(page-2,page+3)
+	#新品
+	book_new=Books.objects.get_books_by_type(type_id=type_id,limit=2,sort='new')
+	#获取类型
+	type_title=BOOKS_TYPE[int(type_id)]
+	context={
+		'book_li':book_li,
+		'book_new':book_new,
+		'type_id': type_id,
+		'sort':sort,
+		'type_title':type_title,
+		'pages':pages
+	}
+	return render(request,'books/list.html',context=context)

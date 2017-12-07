@@ -29,7 +29,7 @@
                 {% endif %}
 				<div class="user_link fl">
 					<span>|</span>
-					<a href="user_center_info.html">用户中心</a>
+					<a href="{% url 'users:user' %}">用户中心</a>
 					<span>|</span>
 					<a href="cart.html">我的购物车</a>
 					<span>|</span>
@@ -40,7 +40,7 @@
 	</div>
 
 	<div class="search_bar clearfix">
-		<a href="index.html" class="logo fl"><img src="/static/images/logo.png" style="width: 160px; height: 53px;"></a>
+		<a href="{% url 'books:index' %}" class="logo fl"><img src="/static/images/logo.png" style="width: 160px; height: 53px;"></a>
 		<div class="search_con fl">
 			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
 			<input type="button" class="input_btn fr" name="" value="搜索">
@@ -55,7 +55,7 @@
 		<div class="navbar">
 			<h1 class="fl">全部商品分类</h1>
 			<ul class="navlist fl">
-				<li><a href="">首页</a></li>
+				<li><a href="{% url 'books:index' %}">首页</a></li>
 				<li class="interval">|</li>
 				<li><a href="">移动端书城</a></li>
 				<li class="interval">|</li>
@@ -66,6 +66,7 @@
 
 	<div class="center_con clearfix">
 		<ul class="subnav fl">
+
 			<li><a href="#model01" class="python">Python</a></li>
 			<li><a href="#model02" class="javascript">Javascript</a></li>
 			<li><a href="#model03" class="algorithms">数据结构与算法</a></li>
@@ -95,11 +96,11 @@
 			<h3 class="fl" id="model01">Python</h3>
 			<div class="subtitle fl">
 				<span>|</span>
-				<a href="#">Python核心编程</a>
-				<a href="#">笨办法学Python</a>
-				<a href="#">Python学习手册</a>
+                {% for i in python_new %}
+                    <a href="{% url 'books:detail' book_id=i.id%}">{{ i.name }}</a>
+                {% endfor %}
 			</div>
-			<a href="#" class="book_more fr">查看更多 ></a>
+			<a href="{% url 'books:list' type_id=1 page=1 %}" class="book_more fr">查看更多 ></a>
 		</div>
 
 		<div class="book_con clearfix">
@@ -108,7 +109,7 @@
                 {% for python in python_hot %}
                     <li>
                         <h4><a href="{% url 'books:detail' book_id=python.id%}">{{ python.name }}</a></h4>
-{#                        传参#}
+{#                        传参 http://192.168.16.50:8000/books/index/2#}
                         <a href="{% url 'books:detail' book_id=python.id%}"><img src="{% static python.image %}"></a>
                         <div class="prize">¥ {{ python.price }}</div>
 				    </li>
@@ -122,10 +123,11 @@
 			<h3 class="fl" id="model02">Javascript</h3>
 			<div class="subtitle fl">
 				<span>|</span>
-				<a href="#">Javascript高级编程</a>
-				<a href="#">Javascript语言精粹</a>				
+				{% for i in javascript_new %}
+                    <a href="{% url 'books:detail' book_id=i.id%}">{{ i.name }}</a>
+                {% endfor %}
 			</div>
-			<a href="#" class="book_more fr">查看更多 ></a>
+			<a href="{% url 'books:list' type_id=2 page=1 %}" class="book_more fr">查看更多 ></a>
 		</div>
 
 		<div class="book_con clearfix">
@@ -133,8 +135,8 @@
 			<ul class="book_list fl">
                 {% for javascript in javascript_hot %}
                     <li>
-                        <h4><a href="#">{{ javascript.name }}</a></h4>
-                        <a href="#"><img src="{% static javascript.image %}"></a>
+                        <h4><a href="{% url 'books:detail' book_id=javascript.id%}">{{ javascript.name }}</a></h4>
+                        <a href="{% url 'books:detail' book_id=javascript.id%}"><img src="{% static javascript.image %}"></a>
                         <div class="prize">¥ {{ javascript.price }}</div>
 				    </li>
                 {% endfor %}
@@ -147,11 +149,11 @@
 			<h3 class="fl" id="model03">数据结构与算法</h3>
 			<div class="subtitle fl">
 				<span>|</span>
-				<a href="#">算法导论</a>
-				<a href="#">数据结构与算法分析</a>
-				<a href="#">计算机程序设计艺术</a>
+				{% for i in algorithms_new %}
+                    <a href="{% url 'books:detail' book_id=i.id%}">{{ i.name }}</a>
+                {% endfor %}
 			</div>
-			<a href="#" class="book_more fr">查看更多 ></a>
+			<a href="{% url 'books:list' type_id=3 page=1 %}" class="book_more fr">查看更多 ></a>
 		</div>
 
 		<div class="book_con clearfix">
@@ -159,8 +161,8 @@
 			<ul class="book_list fl">
                 {% for algorithms in algorithms_hot %}
                     <li>
-                        <h4><a href="#">{{ algorithms.name }}</a></h4>
-                        <a href="#"><img src="{% static algorithms.image %}"></a>
+                        <h4><a href="{% url 'books:detail' book_id=algorithms.id%}">{{ algorithms.name }}</a></h4>
+                        <a href="{% url 'books:detail' book_id=algorithms.id%}"><img src="{% static algorithms.image %}"></a>
                         <div class="prize">¥ {{ algorithms.price }}</div>
 				    </li>
                 {% endfor %}
@@ -173,11 +175,11 @@
 			<h3 class="fl" id="model04">机器学习</h3>
 			<div class="subtitle fl">
 				<span>|</span>
-				<a href="#">机器学习</a>
-				<a href="#">统计学习方法</a>
-				<a href="#">集体智慧编程</a>
+				{% for i in machinelearning_new %}
+                    <a href="{% url 'books:detail' book_id=i.id%}">{{ i.name }}</a>
+                {% endfor %}
 			</div>
-			<a href="#" class="book_more fr">查看更多 ></a>
+			<a href="{% url 'books:list' type_id=4 page=1 %}" class="book_more fr">查看更多 ></a>
 		</div>
 
 		<div class="book_con clearfix">
@@ -185,8 +187,8 @@
 			<ul class="book_list fl">
                 {% for machinelearning in machinelearning_hot %}
                     <li>
-                        <h4><a href="#">{{ machinelearning.name }}</a></h4>
-                        <a href="#"><img src="{% static machinelearning.image %}"></a>
+                        <h4><a href="{% url 'books:detail' book_id=machinelearning.id%}">{{ machinelearning.name }}</a></h4>
+                        <a href="{% url 'books:detail' book_id=machinelearning.id%}"><img src="{% static machinelearning.image %}"></a>
                         <div class="prize">¥ {{ machinelearning.price }}</div>
 				    </li>
                 {% endfor %}
@@ -199,11 +201,11 @@
 			<h3 class="fl" id="model05">操作系统</h3>
 			<div class="subtitle fl">
 				<span>|</span>
-				<a href="#">UNIX环境高级编程</a>
-				<a href="#">深入理解计算机系统</a>
-				<a href="#">现代操作系统</a>
+				{% for i in operatingsystem_new %}
+                    <a href="{% url 'books:detail' book_id=i.id%}">{{ i.name }}</a>
+                {% endfor %}
 			</div>
-			<a href="#" class="book_more fr">查看更多 ></a>
+			<a href="{% url 'books:list' type_id=5 page=1 %}" class="book_more fr">查看更多 ></a>
 		</div>
 
 		<div class="book_con clearfix">
@@ -211,8 +213,8 @@
 			<ul class="book_list fl">
                 {% for operatingsystem in operatingsystem_hot %}
                     <li>
-                        <h4><a href="#">{{ operatingsystem.name }}</a></h4>
-                        <a href="#"><img src="{% static operatingsystem.image %}"></a>
+                        <h4><a href="{% url 'books:detail' book_id=operatingsystem.id%}">{{ operatingsystem.name }}</a></h4>
+                        <a href="{% url 'books:detail' book_id=operatingsystem.id%}"><img src="{% static operatingsystem.image %}"></a>
                         <div class="prize">¥ {{ operatingsystem.price }}</div>
 				    </li>
                 {% endfor %}
@@ -225,11 +227,11 @@
 			<h3 class="fl" id="model06">数据库</h3>
 			<div class="subtitle fl">
 				<span>|</span>
-				<a href="#">数据库系统概念</a>
-				<a href="#">高性能MySQL</a>
-				<a href="#">MySQL必知必会</a>
+				{% for i in database_new %}
+                    <a href="{% url 'books:detail' book_id=i.id%}">{{ i.name }}</a>
+                {% endfor %}
 			</div>
-			<a href="#" class="book_more fr">查看更多 ></a>
+			<a href="{% url 'books:list' type_id=6 page=1 %}" class="book_more fr">查看更多 ></a>
 		</div>
 
 		<div class="book_con clearfix">
@@ -237,9 +239,8 @@
 			<ul class="book_list fl">
                 {% for database in database_hot %}
                     <li>
-                        <h4><a href="#">{{ database.name }}</a></h4>
-                        <a href="#"><img src="{% static database.image %}"></a>
-{#                        /static/{{ database.image }}#}
+                        <h4><a href="{% url 'books:detail' book_id=database.id%}">{{ database.name }}</a></h4>
+                        <a href="{% url 'books:detail' book_id=database.id%}"><img src="{% static database.image %}"></a>
                         <div class="prize">¥ {{ database.price }}</div>
 				    </li>
                 {% endfor %}
@@ -255,7 +256,7 @@
 			<span>|</span>
 			<a href="#">招聘人才</a>
 			<span>|</span>
-			<a href="#">友情链接</a>		
+			<a href="#">友情链接</a>
 		</div>
 		<p>CopyRight © 2016 北京尚硅谷信息技术有限公司 All Rights Reserved</p>
 		<p>电话：010-****888    京ICP备*******8号</p>

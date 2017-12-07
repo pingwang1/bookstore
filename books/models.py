@@ -13,7 +13,7 @@ class BooksManager(models.Manager):
 	def get_books_by_type(self,type_id,limit=None,sort='default'):
 		'''根据商品类型id查询商品信息'''
 		if sort == 'new':
-			order_by = ('-craete_time',)
+			order_by = ('-create_time',)
 		elif sort =='hot':
 			order_by = ('-sales',)
 		elif sort == 'price':
@@ -64,3 +64,5 @@ class Books(BaseModel):
 
 	def __str__(self):
 		return self.name
+
+

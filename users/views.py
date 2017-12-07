@@ -2,9 +2,10 @@ import re
 import json
 from django.shortcuts import render,redirect
 from django.urls import reverse
-from .models import Passport
+from .models import Passport,Address
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from utils.decorators import login_required
 
 # Create your views here.
 def register(request):
@@ -73,6 +74,22 @@ def login_check(request):
 def logout(request):
 	request.session.flush()
 	return redirect(reverse('books:index'))
+
+#装饰器，需要登录才可以进入
+@login_required
+def user(request):
+	'''用户中心－信息页'''
+	passport_id = request.session.get('passport_id')
+	#获取用户的基本信息
+	addr = Address.objects.get_default_address(passport_id=passport_id)
+
+	book_li =[]
+	context = {
+		'addr':addr,
+		'page':'user',
+		'book_li':book_li,
+	}
+	return render(request,'users/user_center_info.html',context)
 
 
 
