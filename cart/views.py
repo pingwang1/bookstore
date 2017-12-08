@@ -58,7 +58,7 @@ def cart_count(request):
 	'''获取用户购物车里商品数量'''
 	#判断用户是否登录
 	if not request.session.has_key('islogin'):
-		return JsonResponse({'res':0})
+		return JsonResponse({'res':0,'errmsg':"请先登录"})
 	#计算用户购物车商品数量
 	conn = get_redis_connection('default')
 	cart_key = 'cart_%d'%request.session.get('passport_id')
@@ -101,3 +101,62 @@ def cart_show(request):
 	}
 
 	return render(request,'cart/cart.html',context)
+
+@csrf_exempt
+def cart_del(request):
+	'''删除用户购物车中的商品信息'''
+	#判断是否登录
+	if not request.session.has_key('islogin'):
+		return JsonResponse({'res':0,'errmsg':'请先登录'})
+
+	#接收数据
+	# print(request.body)
+	print(request.method)
+	# data = json.loads(request.body.decode())
+	books_id = request.POST.get('books_id')
+	#校验商品是否存放
+	if not all([books_id]):
+		return JsonResponse({'res':1,'errmsg':'数据不完整'})
+
+	books = Books.objects.get_books_by_id(books_id=books_id)
+	if books is None:
+		return JsonResponse({'res':2,'errmsg':'商品不存在'})
+	#删除购物车商品信息
+	conn=get_redis_connection('default')
+	cart_key='cart_%d'%request.session.get('passport_id')
+	conn.hdel(cart_key,books_id)
+	#返回信息
+	return JsonResponse({'res':3})
+
+#前端传过来的参数：商品id  books_id 更新数目books_count
+@csrf_exempt
+def cart_update(request):
+	'''更新购物车商品数目'''
+	#判断用户是否登录
+	if not request.session.has_key('islogin'):
+		return JsonResponse({'res':0,'errmsg':'请先登录'})
+	print(request)
+	#接收数据
+	books_id = request.POST.get('books_id')
+	books_count = request.POST.get('books_count')
+
+	#数据的校验
+	if not all([books_id,books_count]):
+		return JsonResponse({'res':1,'errmsg':'数据不完整'})
+	books = Books.objects.get_books_by_id(books_id=books_id)
+	if books is None:
+		return JsonResponse({'res':2,'errmsg':'商品不存在'})
+
+	try:
+		books_count=int(books_count)
+	except Exception as e:
+		return JsonResponse({'res':3,'errmsg':'商品数目必须为整数'})
+
+	#更新操作
+	conn = get_redis_connection('default')
+	cart_key ='cart_%d'%request.session.get('passport_id')
+	#判断商品库存
+	if books_count >books.stock:
+		return JsonResponse({'res':4,'errmsg':'商品库存不足'})
+	conn.hset(cart_key,books_id,books_count)
+	return JsonResponse({'res':5})
