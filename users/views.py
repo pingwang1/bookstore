@@ -23,14 +23,16 @@ def register_handler(request):
 	email = data.get('email')
 	print(username,password,email)
 	#进行数据校验
+	p = Passport.objects.check_passport(username=username)
+	if p:
+		return JsonResponse({'res': '用户名已存在'})
+
 	if not all([username,password,email]):
-		# return render(request,'users/register.html',{'errormsg':'参数不能为空'})
 		return JsonResponse({'res':'参数不能为空'})
 
 	# 判断邮箱是否合法
 	if not re.match(r'^[a-z0-9][\w\.\-]*@[a-z0-9\-]+(\.[a-z]{2,5}){1,2}$', email):
 		# 邮箱不合法
-		# return render(request, 'users/register.html', {'errmsg': '邮箱不合法!'})
 		return JsonResponse({'res': '邮箱不合法!'})
 	#进行业务处理，添加一个账户(这里还没做去重，对用户名)
 	passport =Passport.objects.add_one_passport(username,password,email)

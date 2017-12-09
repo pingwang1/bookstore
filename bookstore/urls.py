@@ -22,4 +22,6 @@ urlpatterns = [
     url(r'^tinymce/',include('tinymce.urls')),
     url(r'^books/',include('books.urls',namespace='books')),#商品模块
     url(r'^cart/',include('cart.urls',namespace='cart')),
+    url(r'^order/',include('order.urls',namespace='order')),
+    
 ]

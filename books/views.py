@@ -4,9 +4,11 @@ from books.enums import *
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator
 from django.http import JsonResponse
+from django.views.decorators.cache import cache_page
 
 
 # Create your views here.
+@cache_page(60*2)
 def index(request):
 	'''显示首页'''
 	#查询每个种类的３个新品信息和４个销量最好的商品信息
@@ -37,6 +39,7 @@ def index(request):
 		'database_new':database_new,
 		'database_hot':database_hot,
 	}
+	print("debug1")
 	#使用模板
 	return render(request,'books/index.html',context)
 

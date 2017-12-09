@@ -25,6 +25,13 @@ class PassportManager(models.Manager):
 			passport = None
 		return passport
 
+	def check_passport(self,username):
+		try:
+			passport = self.get(username=username)
+		except self.models.DoesNotExist:
+			passport=None
+		return passport
+
 
 # Create your models here.
 class Passport(BaseModel):

@@ -75,6 +75,7 @@
                     }
                     else{
                         alert('注册失败！');
+                        $("#user_name").next().html(data.res).show()
                     }
                 },
                 error:function (data) {
