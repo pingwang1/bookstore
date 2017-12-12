@@ -70,6 +70,9 @@ def cart_count(request):
 	return JsonResponse({'res':res})
 
 def cart_show(request):
+	# 判断用户是否登录
+	if not request.session.has_key('islogin'):
+		return JsonResponse({'res': 0, 'errmsg': "请先登录"})
 	'''显示用户购物车的页面'''
 	passport_id = request.session.get('passport_id')
 	#获取用户购物车的记录

@@ -51,7 +51,7 @@
 	<div class="common_list_con clearfix">
 		<dl>
 			<dt>寄送到：</dt>
-			<dd><input type="radio" name="" value="{{ addr.id }}" checked="">{{ addr.recipient_addr }} （{{ addr.recipient_name }} 收） {{ addr.recipient_phone }}</dd>
+			<dd><input type="radio" name="addr_id" value="{{ addr.id }}" checked="">{{ addr.recipient_addr }} （{{ addr.recipient_name }} 收） {{ addr.recipient_phone }}</dd>
 		</dl>
 		<a href="user_center_site.html" class="edit_site">编辑收货地址</a>
 
@@ -138,7 +138,7 @@
             pay_method = $('input[name="pay_style"]:checked').val()
 
             books_ids =$(this).attr('books_ids')
-            console.log(books_ids)
+            console.log(addr_id )
             csrf = $('input[name="csrfmiddlewaretoken"]').val()
             console.log(csrf)
             params = {

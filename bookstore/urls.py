@@ -23,5 +23,5 @@ urlpatterns = [
     url(r'^books/',include('books.urls',namespace='books')),#商品模块
     url(r'^cart/',include('cart.urls',namespace='cart')),
     url(r'^order/',include('order.urls',namespace='order')),
-    
+    url(r'^comments/',include('comments.urls',namespace='comments')),
 ]

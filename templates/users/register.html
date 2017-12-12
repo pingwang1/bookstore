@@ -68,12 +68,13 @@
                 url:'/users/register_handler/',
                 success:function (data) {
                     if (data.res===1){
-                        alert('注册成功！');
+{#                        alert('注册成功！');#}
 {#                        $('#submit').next().val('seccess');#}
                         //跳转到首页
-                        location.href='/users/login/';
+                        location.href='/books/index/';
                     }
                     else{
+                        console.log(data)
                         alert('注册失败！');
                         $("#user_name").next().html(data.res).show()
                     }

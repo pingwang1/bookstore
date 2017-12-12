@@ -1,56 +1,10 @@
+{% extends 'base.html' %}
 {% load staticfiles %}
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-<head>
-	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-	<title>尚硅谷书城-首页</title>
-	<link rel="stylesheet" type="text/css" href="/static/css/reset.css">
-	<link rel="stylesheet" type="text/css" href="/static/css/main.css">
-	<script type="text/javascript" src="/static/js/jquery-1.12.4.min.js"></script>
-	<script type="text/javascript" src="/static/js/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="/static/js/slide.js"></script>
-</head>
-<body>
-	<div class="header_con">
-		<div class="header">
-			<div class="welcome fl">欢迎来到尚硅谷!</div>
-			<div class="fr">
-                {% if request.session.islogin %}
-				<div class="login_btn fl">
-					欢迎您：<em>{{ request.session.username }}</em>
-                    <a href="{% url 'users:logout' %}">退出</a>
-				</div>
-                {% else %}
-				<div class="login_btn fl">
-					<a href="{% url 'users:login' %}">登录</a>
-					<span>|</span>
-					<a href="{% url 'users:register' %}">注册</a>
-				</div>
-                {% endif %}
-				<div class="user_link fl">
-					<span>|</span>
-					<a href="{% url 'users:user' %}">用户中心</a>
-					<span>|</span>
-					<a href="{% url 'cart:cart_show' %}">我的购物车</a>
-					<span>|</span>
-					<a href="user_center_order.html">我的订单</a>
-				</div>
-			</div>
-		</div>		
-	</div>
+{% block title %}
+    <title>尚硅谷书城-详情页</title>
+{% endblock title %}
 
-	<div class="search_bar clearfix">
-		<a href="index.html" class="logo fl"><img src="/static/images/logo.png" style="width: 160px; height: 53px;"></a>
-		<div class="search_con fl">
-			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
-			<input type="button" class="input_btn fr" name="" value="搜索">
-		</div>
-		<div class="guest_cart fr">
-			<a href="{% url 'cart:cart_show' %}" class="cart_name fl">我的购物车</a>
-			<div class="book_count fl" id="show_count">1</div>
-		</div>
-	</div>
-
+{% block content %}
 	<div class="navbar_con">
 		<div class="navbar clearfix">
 			<div class="subnav_con fl">
@@ -103,9 +57,22 @@
 			</div>
 			<div class="total">总价：<em>{{ book.price }}</em></div>
 			<div class="operate_btn">
+                {% csrf_token %}
 				<a href="javascript:;" class="buy_btn">立即购买</a>
 				<a href="javascript:;" class="add_cart" id="add_cart" books_id="{{ book.id }}" >加入购物车</a>
-			</div>
+
+                <a href="javascript:;" id="write-comment" class="comment">我要写评论</a>
+            </div>
+            <div style="display:none;" id="comment-input" data-bookid="{{ book.id }}" data-userid="{{ request.session.passport_id }}">
+                <div>
+                    <input type="text" class="input" placeholder="评论内容"/>
+                </div>
+                <div id="submit-comment">
+                    <button>
+                        提交评论
+                    </button>
+                </div>
+            </div>
 		</div>
 	</div>
 
@@ -127,22 +94,47 @@
 
 		<div class="r_wrap fr clearfix">
 			<ul class="detail_tab clearfix">
-				<li class="active">商品介绍</li>
-				<li>评论</li>
+				<li class="active" id="detail">商品介绍</li>
+				<li id="comment">评论</li>
 			</ul>
 
-			<div class="tab_content">
+			<div class="tab_content" id="book_detail">
 				<dl>
 					<dt>商品详情：</dt>
 					<dd>{{ book.detail |safe }} </dd>
 				</dl>
 			</div>
 
+            <div style="display: none" id="book_comment">
+{#				<dl>#}
+{#					<dt>商品评论：</dt>#}
+{#					<dd>{{ book.detail |safe }} </dd>#}
+{#				</dl>#}
+			</div>
 		</div>
 	</div>
 	<div class="add_jump"></div>
 
-	<script type="text/javascript" src="js/jquery-1.12.2.js"></script>
+
+
+    <style type="text/css">
+        .comment{
+            background-color: #c40000;
+            color:#fff;
+            margin-left: 10px;
+            position: relative;
+            z-index: 10;
+            display: inline-block;
+            width: 178px;
+            height: 38px;
+            border:1px solid #c40000;
+            font-size:14px;
+            line-height: 38px;
+            text-align: center;
+        }
+    </style>
+
+{#	<script type="text/javascript" src="js/jquery-1.12.2.js"></script>#}
 	<script type="text/javascript">
 		var $add_x = $('#add_cart').offset().top;
 		var $add_y = $('#add_cart').offset().left;
@@ -158,7 +150,7 @@
 		    data={
 		        'book_id':books_id,
                 'book_count':book_count,
-                'csrfmiddlewaretoken':csrf,
+                'csrfmiddlewaretoken':csrf
             };
 		    $.ajax({
 		        data:JSON.stringify(data),
@@ -187,7 +179,69 @@
 
             });
 
-		})
+		});
+
+        $.ajax({
+            url:'/comments/comment/' + $('#comment-input').data('bookid'),
+            success:function (res) {
+                if (res.code===200){
+                    var data = res.data;
+                    console.log(data);
+                    var div_head = '<div class="cmt">';
+                    var div_tail = '</div>';
+                    var dom_element = ''
+                    for (i=0;i < data.length;i++){
+                        var u_head='<div class="user">';
+                        var u_tail ='</div>';
+                        var temp = u_head +'<div style="width:70px">' + data[i].user_id + '</div>' +u_tail +'<div class="cm">'+'<div>'
+                        + data[i].content +'</div>'+'</div>';
+                        dom_element +=temp;
+
+                    }
+                    dom_element = div_head+dom_element+div_tail;
+                    console.log(dom_element)
+                    $('#book_comment').append(dom_element);
+                }
+            }
+        });
+
+        $('#detail').click(function () {
+            $(this).addClass('active');
+            $('#comment').removeClass('active');
+            $('#book_comment').hide();
+            $('#book_detail').show();
+        });
+        $('#comment').click(function () {
+            $(this).addClass('active');
+            $('#detail').removeClass('active');
+            $('#book_comment').show();
+            $('#book_detail').hide();
+        });
+        $('#write-comment').click(function () {
+            $('#comment-input').show();
+        });
+        $('#submit-comment').click(function () {
+            var book_id = $('#comment-input').data('bookid');
+            var user_id = $('#comment-input').data('userid');
+            var content = $('#comment-input .input').val();
+            var data={
+                'book_id':book_id,
+                'user_id':user_id,
+                'content':content
+            };
+            console.log('content',content)
+            $.ajax({
+                type:'POST',
+                url:'/comments/comment/'+book_id+'/',
+                data:JSON.stringify(data),
+                success:function (res) {
+                    if (res.code ===200){
+                        $('#comment-input').hide();
+                    }
+                }
+            })
+
+        })
 	</script>
 <script type="application/javascript">
     $.get('/cart/cart_count/',function (data) {
@@ -196,8 +250,7 @@
     });
 </script>
 
-{% block topfiles %}
-    <script type="application/javascript">
+<script type="application/javascript">
     $(function () {
 {#        update_total_price()#}
         //计算总价
@@ -252,7 +305,6 @@
             updata_total_price()
         });
     })
-    </script>
-{% endblock %}
-</body>
-</html>
+</script>
+{% endblock content %}
+

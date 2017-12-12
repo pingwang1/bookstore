@@ -28,7 +28,7 @@ class PassportManager(models.Manager):
 	def check_passport(self,username):
 		try:
 			passport = self.get(username=username)
-		except self.models.DoesNotExist:
+		except self.model.DoesNotExist:
 			passport=None
 		return passport
 

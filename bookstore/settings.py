@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'tinymce',
     'cart',
     'order',
+    'comments',
 ]
 
 MIDDLEWARE = [
@@ -131,6 +132,16 @@ STATICFILES_DIRS=[
     os.path.join(BASE_DIR,'static'),
 ]
 MEDIA_ROOT=os.path.join(BASE_DIR,'static')
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST='smtp.163.com'
+EMAIL_PORT=25
+#发送邮件的邮箱
+EMAIL_HOST_USER = '13693036694@163.com'
+#在邮箱中设置的客户端授权密码
+EMAIL_HOST_PASSWORD='wp19940110'
+#收件人看到的发件人
+EMAIL_FROM='WP<13693036694@163.com>'
+
 TINYMCE_DEFAULT_CONFIG = {
     'theme':'advanced',
     'width':600,
@@ -150,3 +161,5 @@ CACHES = {
 }
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_CACHE_ALIAS = 'default'
+
+ALIPAY_URL='https://openapi.alipaydev.com/gateway.do'
