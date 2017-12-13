@@ -85,7 +85,6 @@
             books_ids =$(this).attr('books_ids')
             console.log(addr_id )
             csrf = $('input[name="csrfmiddlewaretoken"]').val()
-            console.log(csrf)
             params = {
                 'addr_id':addr_id,
                 'pay_method':pay_method,
@@ -104,8 +103,12 @@
                         },3000)
 			        });
                 }
+                else if (data.res==1){
+                    console.log('debug1');
+                    alert(data.errmsg)
+                }
                 else{
-                    alert(data.res,data.errmsg)
+                    alert(data.errmsg)
                 }
             });
 

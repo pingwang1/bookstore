@@ -176,7 +176,8 @@ def order(request):
 		#根据订单id查询订单商品信息
 		order_id = order.order_id
 		order_books_li = OrderGoods.objects.filter(order_id=order_id)
-		order.status= OrderInfo.ORDER_STATUS_CHOICES[order.status-1][1]
+
+		# order.status= OrderInfo.ORDER_STATUS_CHOICES[order.status-1][1]
 
 		#计算商品的小计
 		#order_books - >OrderGoods实例对象

@@ -7,9 +7,7 @@ class BooksIndex(indexes.SearchIndex,indexes.Indexable):
 	text = indexes.CharField(document=True,use_template=True)
 
 	def get_model(self):
-		print(Books)
 		return Books
 
 	def index_queryset(self, using=None):
-		print(self.get_model().objects.all())
 		return self.get_model().objects.all()

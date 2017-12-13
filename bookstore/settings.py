@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'order',
     'comments',
     'haystack',
+    'users.templatetags.filters', # 过滤器功能
 ]
 
 MIDDLEWARE = [
