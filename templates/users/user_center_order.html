@@ -1,51 +1,10 @@
+{% extends 'base.html' %}
 {% load staticfiles %}
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-<head>
-	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-	<title>尚硅谷书城-用户中心</title>
-	<link rel="stylesheet" type="text/css" href="/static/css/reset.css">
-	<link rel="stylesheet" type="text/css" href="/static/css/main.css">
-    <script type="text/javascript" src="/static/js/jquery-1.12.4.min.js"></script>
-	<script type="text/javascript" src="/static/js/jquery-ui.min.js"></script>
-</head>
-<body>
-	<div class="header_con">
-		<div class="header">
-			<div class="welcome fl">欢迎来到尚硅谷书城!</div>
-			<div class="fr">
-                {% if request.session.islogin %}
-				<div class="login_btn fl">
-					欢迎您：<em>{{ request.session.username }}</em>
-				</div>
-                {% else %}
-				<div class="login_btn fl">
-					<a href="login.html">登录</a>
-					<span>|</span>
-					<a href="register.html">注册</a>
-				</div>
-                {% endif %}
-				<div class="user_link fl">
-					<span>|</span>
-					<a href="{% url 'users:user' %}">用户中心</a>
-					<span>|</span>
-					<a href="{% url 'cart:cart_show' %}">我的购物车</a>
-					<span>|</span>
-					<a href="{% url 'users:order' %}">我的订单</a>
-				</div>
-			</div>
-		</div>		
-	</div>
+{% block title %}
+    <title>尚硅谷书城-用户中心</title>
+{% endblock title %}
 
-	<div class="search_bar clearfix">
-		<a href="{% url 'books:index' %}" class="logo fl"><img src="/static/images/logo.png" style="width: 160px; height: 53px;"></a>
-		<div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;用户中心</div>
-		<div class="search_con fr">
-			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
-			<input type="button" class="input_btn fr" name="" value="搜索">
-		</div>		
-	</div>
-
+{% block content %}
 	<div class="main_con clearfix">
 		<div class="left_menu_con clearfix">
 			<h3>用户中心</h3>
@@ -99,19 +58,6 @@
 	</div>
 
 
-	<div class="footer">
-		<div class="foot_link">
-			<a href="#">关于我们</a>
-			<span>|</span>
-			<a href="#">联系我们</a>
-			<span>|</span>
-			<a href="#">招聘人才</a>
-			<span>|</span>
-			<a href="#">友情链接</a>		
-		</div>
-		<p>CopyRight © 2016 北京尚硅谷信息技术有限公司 All Rights Reserved</p>
-		<p>电话：010-****888    京ICP备*******8号</p>
-	</div>
 	<script type="application/javascript">
         $(function () {
             $('.oper_btn').click(function () {
@@ -152,5 +98,4 @@
             });
         })
     </script>
-</body>
-</html>
+{% endblock content %}

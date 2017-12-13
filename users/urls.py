@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from .views import register,register_handler,login,login_check,logout,user,address,order
+from .views import register,register_handler,login,login_check,logout,user,address,order,verifycode,register_active
 
 urlpatterns = [
     url(r'^register/', register,name='register'),
@@ -10,4 +10,7 @@ urlpatterns = [
     url(r'^user/$',user,name='user'),
     url(r'^address/',address,name='address'),
     url(r'^order/',order,name='order'),
+    url(r'^verifycode/',verifycode,name='verifycode'),
+    url(r'^active/(?P<token>.*)/$',register_active,name='active'),
+
 ]

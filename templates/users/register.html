@@ -1,4 +1,12 @@
 {% extends 'base.html' %}
+{% block title %}
+    <title>尚硅谷书城-注册</title>
+{% endblock title %}
+{% block header %}
+{% endblock header %}
+{% block search %}
+{% endblock search %}
+
 {% block content %}
 	<div class="register_con">
 		<div class="l_con fl">
@@ -13,7 +21,6 @@
 				<a href="/users/login/">登录</a>
 			</div>
 			<div class="reg_form clearfix">
-{#				<form >#}
                     {% csrf_token %}
 				<ul>
 					<li>

@@ -10,8 +10,10 @@ from django.http import JsonResponse
 from utils.decorators import login_required
 from django.conf import settings
 from django.core.mail import send_mail
+from users.tasks import send_active_email
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import SignatureExpired
+from django.http import HttpResponse
 #itsdangerous 是一个产生token的库，有flask的作者编写
 
 # Create your views here.
@@ -46,13 +48,16 @@ def register_handler(request):
 	print(passport)
 	#生成激活的token itsdangrous
 	serializer = Serializer(settings.SECRET_KEY,3600)
-	token = serializer.dumps({'comfirm':passport.id})
+	token = serializer.dumps({'confirm':passport.id})
 	print(token)
 	token=token.decode()
 	#给用户的邮箱发送激活邮件
-	send_mail('书城用户激活','',settings.EMAIL_FROM,[email],html_message='<a href="http://192.168.16.67:8000/users/active/%s/">http://192.168.16.67:8000/users/active/</a>'%token)
+	#同步
+	# send_mail('书城用户激活','',settings.EMAIL_FROM,[email],html_message='<a href="http://192.168.16.67:8000/users/active/%s/">http://192.168.16.67:8000/users/active/</a>'%token)
+
+	#异步：使用redis celery 消息队列
+	send_active_email(token,username,email)
 	#注册后，返回到注册页面
-	# return redirect(reverse('books:index'))
 	return JsonResponse({'res':1})
 
 def login(request):
@@ -69,6 +74,10 @@ def login_check(request):
 	username = data.get('username')
 	password = data.get('password')
 	remember = data.get('remember')
+	verifycode=data.get('verifycode')
+	#数据校验
+	if verifycode.lower() !=request.session['verifycode']:
+		return JsonResponse({'code':2})
 	passport = Passport.objects.get_one_passport(username=username,password=password)
 	jres = JsonResponse({'code':200})
 	if passport:
@@ -177,5 +186,70 @@ def order(request):
 		'page':'order'
 	}
 	return render(request,'users/user_center_order.html',context=context)
+
+
+def verifycode(request):
+	#引入绘图模式
+	from PIL import Image,ImageDraw,ImageFont
+	#引入随机函数模块
+	import random
+	#定义变量，用于画面的背景色，宽，高
+	bgcolor = (random.randrange(20,100),random.randrange(20,100),255)
+	width = 100
+	height = 25
+	#创建画面对象
+	im = Image.new('RGB',(width,height),bgcolor)
+	#创建画笔对象
+	draw = ImageDraw.Draw(im)
+	#调用画笔的point()函数绘制噪点
+	for i in range(0,100):
+		xy = (random.randrange(0,width),random.randrange(0,height))
+		fill = (random.randrange(0,255),255,random.randrange(0,255))
+		draw.point(xy,fill=fill)
+
+	#定义验证码的备选值
+	str1='1234567890qwertyuiopasdfghjklzxcvbnm'
+	#随机选取４个值作为验证码
+	rand_str=''
+	for i in range(0,4):
+		rand_str+=str1[random.randrange(0,len(str1))]
+	#构造字体对象
+	font = ImageFont.truetype("/usr/share/fonts/truetype/fonts-japanese-gothic.ttf",15)
+	#构造字体颜色
+	fontcolor = (255,random.randrange(0,255),random.randrange(0,255))
+	#绘制４个字
+	draw.text((5,2),rand_str[0],font=font,fill=fontcolor)
+	draw.text((25,2),rand_str[1],font=font,fill=fill)
+	draw.text((50,2),rand_str[2],font=font,fill=fill)
+	draw.text((75,2),rand_str[3],font=font,fill=fill)
+
+	#释放画笔
+	del draw
+	#存入session，用于做进一步的验证
+	request.session['verifycode']=rand_str
+	#内存文件操作
+	import io
+	buf = io.BytesIO()
+	#将图片保存在内存中,文件类型为png
+	im.save(buf,'png')
+	#将内存中的图片数据返回给客户端，MIME类型为图片png
+	return HttpResponse(buf.getvalue(),'image/png')
+
+
+def register_active(request,token):
+	'''用户账户激活'''
+	serializer = Serializer(settings.SECRET_KEY,3600)
+	try:
+		info = serializer.loads(token)
+		passport_id=info['confirm']
+		#进行用户激活
+		passport=Passport.objects.get(id=passport_id)
+		passport.is_active=True
+		passport.save()
+		#跳转到登录页
+		return redirect(reverse('users:login'))
+	except SignatureExpired:
+		#链接过期
+		return HttpResponse('激活链接已过期')
 
 

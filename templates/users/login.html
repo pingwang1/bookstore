@@ -1,7 +1,12 @@
 {% extends 'base.html' %}
 {% block title %}
     <title>尚硅谷书城-登录</title>
-    {% endblock title %}
+{% endblock title %}
+{% block header %}
+{% endblock header %}
+{% block search %}
+{% endblock search %}
+
 {% block content %}
 	<div class="login_top clearfix">
 		<a href="../books/index.html" class="login_logo"><img src="/static/images/logo.png" style="width: 160px; height: 53px;"></a>
@@ -14,12 +19,11 @@
 			<div class="login_form fr">
 				<div class="login_title clearfix">
 					<h1>用户登录</h1>
-					<a href="#">立即注册</a>
+					<a href="/users/register/">立即注册</a>
 				</div>
                 <div class="clearfix">{{ errormsg }}</div>
 				<div class="form_input">
 {#					<form method="post" action="/users/login_check/">#}
-
                         {% csrf_token %}
 						<input type="text" name="username" id="username" class="name_input" value="{{ username }}" placeholder="请输入用户名">
 						<div class="user_error">输入错误</div>
@@ -30,8 +34,11 @@
 							<label>记住用户名</label>
 							<a href="#">忘记密码</a>
 						</div>
+                        <div style="top:100px;position:absolute;">
+                            <input type="text" id="vc" name="vc">
+                            <img id="verifycode" src="/users/verifycode/" alt="checkcode"/>
+                        </div>
 						<input type="submit" name="" id="submit" value="登录" class="input_submit">
-
 				</div>
 			</div>
 		</div>
@@ -43,12 +50,13 @@
         var csrf = $('input[name="csrfmiddlewaretoken"]').val()
         var remember = $('input[name="remember"]').prop('checked');
         console.log(remember)
+        var vc =$('input[name="vc"]').val()
         data={
             'username':username,
             'password':password,
             'remember':remember,
             'csrfmiddlewaretoken':csrf,
-
+            'verifycode':vc,
         }
         $.ajax({
             data:JSON.stringify(data),
@@ -59,6 +67,9 @@
                 if (data.code==200){
                     alert('登录成功！');
                     location.href='/books/index/';
+                }
+                else if (data.code ==2 ){
+                    $("#username").next().html('验证码错误').show()
                 }
                 else{
                     alert('登录失败！')
