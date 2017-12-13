@@ -1,4 +1,6 @@
 from django.shortcuts import render,redirect
+from django_redis import get_redis_connection
+
 from books.models import Books
 from books.enums import *
 from django.core.urlresolvers import reverse
@@ -43,11 +45,33 @@ def index(request):
 	return render(request,'books/index.html',context)
 
 def detail(request,book_id):
+	'''显示商品的详情页面'''
+	#获取商品的详情信息
 	book = Books.objects.get_books_by_id(books_id=book_id)
 	print(book.name,book.price,book.desc,book.detail)
+	if book is None:
+		#商品不存在，跳转到首页
+		return redirect(reverse('books:index'))
 	book_new=Books.objects.get_books_by_type(type_id=book.type_id,limit=2)
+	#用户和登录之后，才记录浏览记录
+	#每个用户浏览记录对应redis中的一条信息，格式：history_用户id:[10,9,2,3,4]
+	#[9,10,2,3,4]
+	if request.session.has_key('islogin'):
+		#用户已登录，记录浏览记录
+		con = get_redis_connection('default')
+		key = 'history_%d'%request.session.get('passport_id')
+		#先从redis列表中移除book.id
+		con.lrem(key,0,book_id)
+		con.lpush(key,book_id)
+		#保存用户最近浏览的５个商品
+		con.ltrim(key,0,4)
+	context={
+		'book':book,
+		'book_new':book_new,
+
+	}
 	# return JsonResponse({'code':200})
-	return render(request,'books/detail.html',{'book':book,'book_new':book_new})
+	return render(request,'books/detail.html',context)
 
 # 商品种类 页码 排序方式
 # /list/(种类id)/(页码)/?sort=排序方式

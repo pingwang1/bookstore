@@ -75,6 +75,8 @@
 		
 		<div class="mask"></div>
 	</div>
+{% endblock content %}
+{% block js %}
 	<script type="text/javascript">
 		$('#order_btn').click(function() {
             //获取收货地址的id,支付方式，用户购买商品的id
@@ -109,4 +111,5 @@
 
 		});
 	</script>
-{% endblock content %}
+{% endblock js %}
+

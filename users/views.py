@@ -3,7 +3,10 @@ import json
 
 from django.shortcuts import render,redirect
 from django.urls import reverse
+from django_redis import get_redis_connection
+
 from .models import Passport,Address
+from books.models import Books
 from order.models import OrderInfo,OrderGoods
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
@@ -32,7 +35,6 @@ def register_handler(request):
 	email = data.get('email')
 	#进行数据校验
 	p = Passport.objects.check_passport(username=username)
-	print('==============')
 	if p:
 		return JsonResponse({'res': '用户名已存在'})
 
@@ -114,8 +116,15 @@ def user(request):
 	passport_id = request.session.get('passport_id')
 	#获取用户的基本信息
 	addr = Address.objects.get_default_address(passport_id=passport_id)
-
+	#获取用户的最近浏览信息
+	con =get_redis_connection('default')
+	key ='history_%d'%passport_id
+	#取出用户最近浏览的５个商品的id
+	history_li = con.lrange(key,0,4)
 	book_li =[]
+	for id in history_li:
+		book = Books.objects.get_books_by_id(books_id=id)
+		book_li.append(book)
 	context = {
 		'addr':addr,
 		'page':'user',

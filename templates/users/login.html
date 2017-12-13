@@ -43,6 +43,8 @@
 			</div>
 		</div>
 	</div>
+{% endblock content %}
+    {% block js %}
 <script type="application/javascript">
     $('#submit').click(function () {
         var username = $('#username').val();
@@ -80,4 +82,4 @@
 
     });
 </script>
-{% endblock content %}
+{% endblock js %}

@@ -19,7 +19,8 @@ def order_place(request):
 	'''显示提交订单页面'''
 	#接受数据
 	books_ids = request.POST.getlist('books_ids')
-	print(books_ids)
+	if not books_ids:
+		return redirect(reverse('cart:cart_show'))
 	if not all([books_ids]):
 		#跳转到购物车页面
 		return redirect(reverse('cart:cart_show'))
@@ -55,7 +56,7 @@ def order_place(request):
 	transit_price =10
 	total_pay = total_price+transit_price
 
-	#1,2,3
+	#1,2,3(转为字符串)
 	books_ids = ','.join(books_ids)
 	#组织模板上下文
 	context = {

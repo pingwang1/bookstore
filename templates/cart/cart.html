@@ -44,7 +44,7 @@
 	</ul>
     </form>
 {% endblock content %}
-
+{% block js %}
 	<script type="application/javascript">
         $(function () {
             //计算所有被选择的商品的总价，总数目和商品的小计
@@ -260,7 +260,7 @@
                 });
                 //设置异步
                 $.ajaxSettings.async=true
-
             }
         })
     </script>
+{% endblock js %}
