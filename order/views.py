@@ -64,7 +64,7 @@ def order_place(request):
 		'books_li':books_li,
 		'total_price':total_price,
 		'total_count':total_count,
-		'transit':transit_price,
+		'transit_price':transit_price,
 		'total_pay':total_pay,
 		'books_ids':books_ids,
 	}

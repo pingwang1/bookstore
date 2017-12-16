@@ -9,7 +9,7 @@
 			<h3>用户中心</h3>
 			<ul>
 				<li><a href="{% url 'users:user' %}" class="active">· 个人信息</a></li>
-				<li><a href="{% url 'users:order' %}">· 全部订单</a></li>
+				<li><a href="{% url 'users:order' page=1%}">· 全部订单</a></li>
 				<li><a href="{% url 'users:address' %}">· 收货地址</a></li>
 			</ul>
 		</div>
@@ -38,7 +38,7 @@
                                 <div class="operate">
                                     <span class="prize">￥{{ book.price }}</span>
                                     <span class="unit">/{{ book.unit }}</span>
-                                    <a href="#" class="add_book" title="加入购物车"></a>
+                                    <a href="javascript:;"  books_id="{{ book.id }}"class="add_book" title="加入购物车"></a>
                                 </div>
                             </li>
                         {% empty %}
@@ -48,4 +48,39 @@
 		</div>
 		</div>
 	</div>
+
 {% endblock content %}
+{% block js %}
+    <script type="application/javascript">
+		$('.add_book').click(function(){
+		    var books_id=$(this).attr('books_id');
+		    var book_count =1;
+		    var csrf = $('input[name="csrfmiddlewaretoken"]').val();
+		    data={
+		        'book_id':books_id,
+                'book_count':book_count,
+                'csrfmiddlewaretoken':csrf
+            };
+		    $.ajax({
+		        data:JSON.stringify(data),
+		        type:'POST',
+                url:'/cart/cart_add/',
+                success:function (data) {
+                    console.log(data.code);
+                    //添加成功
+                    if (data.code==5) {
+                        count = $('#show_count').html()
+                        count = parseInt(count) + parseInt(book_count)
+                        $('#show_count').html(count);
+                    }
+                    else{
+                        //添加失败
+                        alert(data.errmsg);
+                    }
+                }
+
+            });
+
+		});
+    </script>
+{% endblock js %}

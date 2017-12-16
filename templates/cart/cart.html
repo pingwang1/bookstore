@@ -60,8 +60,12 @@
                     console.log(total_count,total_price)
                 })
                 //设置商品的总价和总数目
-                $('.settlements').find('em').text(total_price.toFixed(2))
-                $('.settlements').find('b').text(total_count)
+                $('.settlements').find('em').text(total_price.toFixed(2));
+                $('.settlements').find('b').text(total_count);
+
+                $('.total_count').children('em').text(total_count);
+                $('#show_count').html(total_count);
+
             }
             //计算商品的小计
             function update_books_price(books_ul) {
@@ -82,7 +86,9 @@
             //更新页面上购物车商品的总数
             function update_cart_count() {
                 $.get('/cart/cart_count/',function (data) {
-                    $('.total_count').children('em').text(data.res)
+                    $('.total_count').children('em').text(data.res);
+                    //res是商品的总数
+                    $('#show_count').html(data.res);
                 })
             }
             //购物车商品信息的删除
@@ -123,6 +129,7 @@
                 })
                 //更新商品的信息
                 update_total_price()
+
             });
             //商品对应的checkbox状态发生改变时，全选checkbox的改变
             $('.cart_list_td').find(':checkbox').change(function () {

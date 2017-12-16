@@ -9,7 +9,7 @@ urlpatterns = [
     url(r'^logout/$',logout,name='logout'),
     url(r'^user/$',user,name='user'),
     url(r'^address/',address,name='address'),
-    url(r'^order/',order,name='order'),
+    url(r'^order/(?P<page>\d+)/$',order,name='order'),
     url(r'^verifycode/',verifycode,name='verifycode'),
     url(r'^active/(?P<token>.*)/$',register_active,name='active'),
 

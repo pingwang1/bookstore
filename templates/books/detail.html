@@ -106,31 +106,13 @@
 			</div>
 
             <div style="display: none" id="book_comment">
-{#				<dl>#}
-{#					<dt>商品评论：</dt>#}
-{#					<dd>{{ book.detail |safe }} </dd>#}
-{#				</dl>#}
+
 			</div>
 		</div>
 	</div>
 	<div class="add_jump"></div>
 
-    <style type="text/css">
-        .comment{
-            background-color: #c40000;
-            color:#fff;
-            margin-left: 10px;
-            position: relative;
-            z-index: 10;
-            display: inline-block;
-            width: 178px;
-            height: 38px;
-            border:1px solid #c40000;
-            font-size:14px;
-            line-height: 38px;
-            text-align: center;
-        }
-    </style>
+
 {% endblock content %}
 {% block js %}
 	<script type="text/javascript">
@@ -189,12 +171,10 @@
                     var div_tail = '</div>';
                     var dom_element = ''
                     for (i=0;i < data.length;i++){
-                        var u_head='<div class="user">';
+                        var u_head='<div class="clearfix">';
                         var u_tail ='</div>';
-                        var temp = u_head +'<div style="width:70px">' + data[i].user_id + '</div>' +u_tail +'<div class="cm">'+'<div>'
-                        + data[i].content +'</div>'+'</div>';
+                        var temp = u_head +'<div class="user fl">' + data[i].user_id +u_tail +'<div class="comts">'+ data[i].content +'</div>'+u_tail
                         dom_element +=temp;
-
                     }
                     dom_element = div_head+dom_element+div_tail;
                     console.log(dom_element)
@@ -300,6 +280,26 @@
             });
         })
     </script>
+<style type="text/css">
+    .comment{
+        background-color: #c40000;
+        color:#fff;
+        margin-left: 10px;
+        position: relative;
+        z-index: 10;
+        display: inline-block;
+        width: 178px;
+        height: 38px;
+        border:1px solid #c40000;
+        font-size:14px;
+        line-height: 38px;
+        text-align: center;
+    }
+    .user{
+        margin:24px 0 0 24px;
+        background-color:#FFEDED;
+    }
+</style>
 {% endblock js %}
 
 

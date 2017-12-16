@@ -48,7 +48,6 @@ def detail(request,book_id):
 	'''显示商品的详情页面'''
 	#获取商品的详情信息
 	book = Books.objects.get_books_by_id(books_id=book_id)
-	print(book.name,book.price,book.desc,book.detail)
 	if book is None:
 		#商品不存在，跳转到首页
 		return redirect(reverse('books:index'))

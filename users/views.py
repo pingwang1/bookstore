@@ -17,6 +17,7 @@ from users.tasks import send_active_email
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import SignatureExpired
 from django.http import HttpResponse
+from django.core.paginator import Paginator
 #itsdangerous 是一个产生token的库，有flask的作者编写
 
 # Create your views here.
@@ -164,21 +165,43 @@ def address(request):
 		return redirect(reverse('users:address'))
 
 @login_required
-def order(request):
+def order(request,page):
 	'''用户中心－订单页'''
 	#查询用户的订单信息
 	passport_id = request.session.get('passport_id')
 	#获取订单信息
 	order_li = OrderInfo.objects.filter(passport_id=passport_id)
+	#分页
+	paginator = Paginator(order_li,2)
+	#获取分页后的总页数
+	num_pages =paginator.num_pages
+	#获取第page页是数据
+	if page=='' or int(page) > num_pages:
+		page =1
+	else:
+		page = int(page)
+	# 返回值是一个Ｐａｇｅ类的实例对象
+	order_li = paginator.page(page)
+	# 进行页码控制
+	# 1.总页数<5,显示所有页码
+	# 2.当前页是前三页，显示１－５
+	# 3.当前页是后３页，显示后５页
+	# 4.其他情况，显示当前页前２页，后两页，当前页
+	if num_pages <5:
+		pages =range(1,num_pages+1)
+	elif num_pages <3:
+		pages = range(1,6)
+	elif num_pages -page <=2:
+		pages = range(num_pages-4,num_pages+1)
+	else:
+		pages=range(page-2,page+3)
 	#遍历获取订单的商品信息
 	#order->OrderInfo 实例对象
 	for order in order_li:
 		#根据订单id查询订单商品信息
 		order_id = order.order_id
 		order_books_li = OrderGoods.objects.filter(order_id=order_id)
-
 		# order.status= OrderInfo.ORDER_STATUS_CHOICES[order.status-1][1]
-
 		#计算商品的小计
 		#order_books - >OrderGoods实例对象
 		for order_books in order_books_li:
@@ -193,7 +216,8 @@ def order(request):
 
 	context ={
 		'order_li':order_li,
-		'page':'order'
+		'page':'order',
+		'pages':pages
 	}
 	return render(request,'users/user_center_order.html',context=context)
 

@@ -10,7 +10,7 @@
 			<h3>用户中心</h3>
 			<ul>
 				<li><a href="{% url 'users:user' %}">· 个人信息</a></li>
-				<li><a href="{% url 'users:order' %}">· 全部订单</a></li>
+				<li><a href="{% url 'users:order' page=1%}">· 全部订单</a></li>
 				<li><a href="{% url 'users:address' %}" class="active">· 收货地址</a></li>
 			</ul>
 		</div>

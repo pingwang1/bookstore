@@ -11,7 +11,7 @@
 			<h3>用户中心</h3>
 			<ul>
 				<li><a href="{% url 'users:user' %}">· 个人信息</a></li>
-				<li><a href="{% url 'users:order' %}" class="active">· 全部订单</a></li>
+				<li><a href="{% url 'users:order' page=1%}" class="active">· 全部订单</a></li>
 				<li><a href="{% url 'users:address' %}">· 收货地址</a></li>
 			</ul>
 		</div>
@@ -47,13 +47,20 @@
         {% endfor %}
 
 				<div class="pagenation">
-					<a href="#"><上一页</a>
-					<a href="#" class="active">1</a>
-					<a href="#">2</a>
-					<a href="#">3</a>
-					<a href="#">4</a>
-					<a href="#">5</a>
-					<a href="#">下一页></a>
+                    {% if order_li.has_previous %}
+					<a href="/users/order/{{ order_li.previous_page_number }}/">上一页</a>
+                    {% endif %}
+                    {% for pindex in pages %}
+                        {% if pindex == order_li.number %}
+                            <a href="/users/order/{{ pindex }}/" class="active">{{ pindex }}</a>
+                        {% else %}
+                            <a href="/users/order/{{ pindex }}/">{{ pindex }}</a>
+                        {% endif %}
+                    {% endfor %}
+					{% if order_li.has_next %}
+					<a href="/users/order/{{ order_li.next_page_number }}">下一页></a>
+                    {% endif %}
+
 				</div>
 		</div>
 	</div>

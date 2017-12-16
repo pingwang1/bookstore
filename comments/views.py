@@ -26,7 +26,6 @@ def comment(request,books_id):
 			c = c.decode('utf-8')
 		except:
 			pass
-		print('c:',c)
 		if c:
 			return JsonResponse({
 				'code':200,
@@ -50,17 +49,16 @@ def comment(request,books_id):
 			except Exception as e:
 				print('e:',e)
 			return JsonResponse(res)
-
 	else:
 		params = json.loads(request.body.decode('utf-8'))
 		book_id = params.get('book_id')
 		user_id = params.get('user_id')
 		content = params.get('content')
-
 		book = Books.objects.get(id=book_id)
 		user = Passport.objects.get(id=user_id)
+		redis_db.delete('comment_%s' % book_id)
 		comment = Comments(book=book,user=user,content=content)
 		comment.save()
-		print(comment)
+		print("debug",comment)
 
 		return JsonResponse({'code':200,'msg':'评论成功'})
