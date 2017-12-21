@@ -1,4 +1,4 @@
-import re
+﻿import re
 import json
 
 from django.shortcuts import render,redirect
@@ -34,8 +34,10 @@ def register_handler(request):
 	username = data.get('username')
 	password = data.get('password')
 	email = data.get('email')
+	print("debug0:",username,password,email)
 	#进行数据校验
 	p = Passport.objects.check_passport(username=username)
+	print("debug1:",p)
 	if p:
 		return JsonResponse({'res': '用户名已存在'})
 
@@ -46,21 +48,29 @@ def register_handler(request):
 	if not re.match(r'^[a-z0-9][\w\.\-]*@[a-z0-9\-]+(\.[a-z]{2,5}){1,2}$', email):
 		# 邮箱不合法
 		return JsonResponse({'res': '邮箱不合法!'})
-	#进行业务处理，添加一个账户(这里还没做去重，对用户名)
+	#进行业务处理，添加一个账户
 	passport =Passport.objects.add_one_passport(username,password,email)
-	print(passport)
+	print("debug2:",passport)
 	#生成激活的token itsdangrous
 	serializer = Serializer(settings.SECRET_KEY,3600)
 	token = serializer.dumps({'confirm':passport.id})
-	print(token)
-	token=token.decode()
+	print("debug3:",token)
+	try:
+	    token=token.decode()
+	except Exception as e:
+	    print("debug4:",e)
+	print('123')
 	#给用户的邮箱发送激活邮件
 	#同步
 	# send_mail('书城用户激活','',settings.EMAIL_FROM,[email],html_message='<a href="http://192.168.16.67:8000/users/active/%s/">http://192.168.16.67:8000/users/active/</a>'%token)
 
 	#异步：使用redis celery 消息队列
-	send_active_email(token,username,email)
+	try:
+	    send_active_email(token,username,email)
+	except Exception as e:
+	    print("debug5:",e)
 	#注册后，返回到注册页面
+	print("debug6:",111)
 	return JsonResponse({'res':1})
 
 def login(request):
@@ -248,7 +258,7 @@ def verifycode(request):
 	for i in range(0,4):
 		rand_str+=str1[random.randrange(0,len(str1))]
 	#构造字体对象
-	font = ImageFont.truetype("/usr/share/fonts/truetype/fonts-japanese-gothic.ttf",15)
+	font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",15,encoding='unic')
 	#构造字体颜色
 	fontcolor = (255,random.randrange(0,255),random.randrange(0,255))
 	#绘制４个字

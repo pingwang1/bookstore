@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 {% block title %}
     <title>尚硅谷书城-注册</title>
 {% endblock title %}
@@ -70,6 +70,7 @@
                 'password':password,
                 'email':email,
             };
+	    console.log(username,password,email);
             $.ajax({
                 data:JSON.stringify(data),
                 type:'POST',
